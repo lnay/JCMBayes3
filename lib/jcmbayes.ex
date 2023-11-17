@@ -32,7 +32,8 @@ end
 
 defmodule ExampleConsumer do
   use Nostrum.Consumer
-  @channel_id Application.get_env(:nostrum, :channel)
+  @channel_id Application.compile_env(:nostrum, :channel)
+  @permissible_message ~r/^(?<location>jcmb|bayes)(\s+[a-z0-9_\-:\.]+)?[!?]?$/ix
 
   alias Nostrum.Api
 
@@ -44,21 +45,11 @@ defmodule ExampleConsumer do
     },
     _ws_state}
   ) do
+    # TODO ignore messages from this bot
     Logger.info("handling event")
-    case content do
-      "!sleep" ->
-        Api.create_message(@channel_id, "Going to sleep...")
-        # This won't stop other events from being handled.
-        Process.sleep(3000)
-
-      "!ping" ->
-        Logger.info("received a ping")
-        Api.create_message(@channel_id, "pyongyang!")
-
-      "!raise" ->
-        # This won't crash the entire Consumer.
-        raise "No problems here!"
-
+    case Regex.named_captures(@permissible_message, content) do
+      %{"location" => location} ->
+        Api.create_message(@channel_id, "location: #{location}")
       _ ->
         :ignore
     end
