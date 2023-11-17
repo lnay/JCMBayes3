@@ -1,20 +1,11 @@
-defmodule Jcmbayes.Application do
+require Logger
+
+defmodule Jcmbayes do
   use Application
-  @moduledoc """
-  Documentation for `Jcmbayes`.
-  """
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Jcmbayes.hello()
-      :world
-
-  """
   def start(_type, _args) do
-    children = [MessageConsumer]
+    Logger.info("Starting Jcmbayes...")
+    children = [ExampleConsumer]
     Supervisor.start_link(children, strategy: :one_for_one)
   end
 
@@ -23,13 +14,13 @@ defmodule Jcmbayes.Application do
   end
 end
 
-
-defmodule MessageConsumer do
+defmodule ExampleConsumer do
   use Nostrum.Consumer
 
   alias Nostrum.Api
 
   def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
+    Logger.info("handling event")
     case msg.content do
       "!sleep" ->
         Api.create_message(msg.channel_id, "Going to sleep...")
@@ -37,6 +28,7 @@ defmodule MessageConsumer do
         Process.sleep(3000)
 
       "!ping" ->
+        Logger.info("received a ping")
         Api.create_message(msg.channel_id, "pyongyang!")
 
       "!raise" ->
