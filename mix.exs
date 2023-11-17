@@ -14,7 +14,7 @@ defmodule Jcmbayes.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {Jcmbayes, []},
+      mod: {Jcmbayes.Application, []},
       extra_applications: [:logger]
     ]
   end
