@@ -1,5 +1,6 @@
 require Logger
 
+
 defmodule Jcmbayes.Application do
   use Application
 
@@ -31,20 +32,28 @@ end
 
 defmodule ExampleConsumer do
   use Nostrum.Consumer
+  @channel_id Application.get_env(:nostrum, :channel)
 
   alias Nostrum.Api
 
-  def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
+  def handle_event({
+    :MESSAGE_CREATE,
+    %{
+      :content => content,
+      :channel_id => @channel_id, # Only listen to channel specified in config
+    },
+    _ws_state}
+  ) do
     Logger.info("handling event")
-    case msg.content do
+    case content do
       "!sleep" ->
-        Api.create_message(msg.channel_id, "Going to sleep...")
+        Api.create_message(@channel_id, "Going to sleep...")
         # This won't stop other events from being handled.
         Process.sleep(3000)
 
       "!ping" ->
         Logger.info("received a ping")
-        Api.create_message(msg.channel_id, "pyongyang!")
+        Api.create_message(@channel_id, "pyongyang!")
 
       "!raise" ->
         # This won't crash the entire Consumer.
