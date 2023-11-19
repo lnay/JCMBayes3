@@ -1,0 +1,11 @@
+{
+  "image": "docker.io/elixir",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "JakeBecker.elixir-ls"
+      ]
+    }
+  }
+}
