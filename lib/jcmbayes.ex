@@ -42,10 +42,11 @@ defmodule ExampleConsumer do
     %{
       :content => content,
       :channel_id => @channel_id, # Only listen to channel specified in config
+      :author => author
     },
     _ws_state}
-  ) do
-    # TODO ignore messages from this bot
+  ) when author.bot==nil # ignore messages from bots (including self)
+  do
     Logger.info("handling event")
     case Regex.named_captures(@permissible_message, content) do
       %{"location" => location} ->
